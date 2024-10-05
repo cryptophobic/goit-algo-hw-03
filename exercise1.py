@@ -1,6 +1,7 @@
 import argparse
 import re
 import shutil
+import sys
 from pathlib import *
 
 class Copy:
@@ -9,8 +10,15 @@ class Copy:
         self.__destination_path = destination
 
     def process(self):
-        self.__check_and_prepare()
-        self.__recursive_walk(Path(self.__source_path))
+        try:
+            self.__check_and_prepare()
+            self.__recursive_walk(Path(self.__source_path))
+        except FileNotFoundError as error:
+            sys.stderr.write(f"Path not found: {str(error)}\n")
+        except PermissionError as error:
+            sys.stderr.write(f"Cannot read the contents: {str(error)}\n")
+        except NotADirectoryError as error:
+            sys.stderr.write(f"{str(error)}\n")
 
     def __check_and_prepare(self):
         source = Path(self.__source_path)
